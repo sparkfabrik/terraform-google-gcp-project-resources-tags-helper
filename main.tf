@@ -119,14 +119,6 @@ resource "google_tags_location_tag_binding" "buckets" {
   parent    = "//storage.googleapis.com/projects/_/buckets/${each.value.bucket_name}"
   location  = each.value.bucket_location
   tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
-
-  provisioner "local-exec" {
-    command = ""
-    interpreter = [
-      "/bin/sh", "-c"
-    ]
-    when = create
-  }
 }
 
 # For a CloudSQL instance, even if regional, we can use a normal tag binding,
