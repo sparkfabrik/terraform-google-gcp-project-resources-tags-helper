@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../terraform-google-gcp-application-bucket-creation-helper/.idea/terraform-google-gcp-application-bucket-creation-helper.iml" filepath="$PROJECT_DIR$/../terraform-google-gcp-application-bucket-creation-helper/.idea/terraform-google-gcp-application-bucket-creation-helper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../terraform-google-gcp-mysql-db-and-user-creation-helper/.idea/terraform-google-gcp-mysql-db-and-user-creation-helper.iml" filepath="$PROJECT_DIR$/../terraform-google-gcp-mysql-db-and-user-creation-helper/.idea/terraform-google-gcp-mysql-db-and-user-creation-helper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/terraform-google-gcp-project-resources-tags-helper.iml" filepath="$PROJECT_DIR$/.idea/terraform-google-gcp-project-resources-tags-helper.iml" />
+    </modules>
+  </component>
+</project>
