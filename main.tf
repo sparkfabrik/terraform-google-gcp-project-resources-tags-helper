@@ -94,10 +94,6 @@ locals {
   }
 }
 
-data "google_project" "project" {
-  project_id = var.project_id
-}
-
 # Retrieve the tag keys for the tags that we are passing to the resources.
 # We split the friendly name we are passing to the module, to get the tag key shortname
 # as the index 0, and the tag value shortname as the index 1.
@@ -130,7 +126,7 @@ resource "google_tags_location_tag_binding" "buckets" {
 resource "google_tags_location_tag_binding" "cloudsql" {
   for_each = local.map_of_cloudsql_instances_to_be_tagged
   # Parent full resource name reference: https://cloud.google.com/iam/docs/full-resource-names
-  parent    = "//sqladmin.googleapis.com/projects/${data.google_project.project.number}/instances/${each.value.instance_id}"
+  parent    = "//sqladmin.googleapis.com/projects/${var.project_id}/instances/${each.value.instance_id}"
   location  = each.value.instance_location
   tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
 }
