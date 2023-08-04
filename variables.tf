@@ -9,7 +9,7 @@ variable "default_location" {
 }
 
 variable "tags_to_be_discovered" {
-  description = "The map with the tags we want to discover with a full structure key / values, for example: { 'tag_key_short_name_1' = ['tag_value_short_name_1','tag_value_short_name_2'], 'tag_key_short_name_2' = ['tag_value_short_name_1','tag_value_short_name_2','tag_value_short_name_3'] }. The module will print the tag informations as output."
+  description = "The map with the tags we want to discover with a full structure key / values, see the README.md for an example. The module will print the tag informations as output."
   type        = map(list(string))
   default     = {}
 }
@@ -21,7 +21,7 @@ variable "global_tags" {
 }
 
 variable "buckets_to_be_tagged" {
-  description = "A structured list of objects, containing the list of buckets we want to tag and the tag values, in the form <TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>. If no bucket_location is specified, the value of default_location will be used."
+  description = "A structured list of objects, containing the list of buckets we want to tag and the tag values, in the form `<TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>`. If no bucket_location is specified, the value of default_location will be used."
   type = list(object({
     bucket_name     = string
     tags            = optional(list(string), [])
@@ -31,10 +31,11 @@ variable "buckets_to_be_tagged" {
 }
 
 variable "cloudsql_instances_to_be_tagged" {
-  description = "A structured list of objects, containing the list of cloudSQL instances we want to tag, with instance name, and tag values"
+  description = "A structured list of objects, containing the list of cloudSQL instances we want to tag, with instance name, instance location (region) and tag values."
   type = list(object({
-    instance_name = string
-    tags          = optional(list(string), [])
+    instance_id       = string
+    tags              = optional(list(string), [])
+    instance_location = optional(string, null)
   }))
   default = []
 }

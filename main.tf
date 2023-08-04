@@ -15,7 +15,9 @@ locals {
 }
 
 data "google_tags_tag_key" "project_tag_keys_to_discover" {
-  for_each   = toset([for tag_key, tag_values in var.tags_to_be_discovered : tag_key])
+  for_each = toset([
+    for tag_key, tag_values in var.tags_to_be_discovered : tag_key
+  ])
   parent     = "projects/${var.project_id}"
   short_name = each.value
 }
@@ -58,7 +60,6 @@ locals {
   #   "bucket_name--tag2_friendly_name" = {
   # ...
   # }
-
   map_of_buckets_to_be_tagged = {
     for obj in flatten([
       for item in local.buckets_to_be_tagged : [
@@ -74,8 +75,9 @@ locals {
   # Add the global tags to the CloudSQL instances we want to tag.
   cloudsql_instances_to_be_tagged = [
     for cloussql_instance in var.cloudsql_instances_to_be_tagged : {
-      instance_name = cloussql_instance.instance_name
-      tags          = length(cloussql_instance.tags) > 0 ? cloussql_instance.tags : var.global_tags
+      instance_id       = cloussql_instance.instance_id
+      instance_location = cloussql_instance.instance_location != null ? cloussql_instance.instance_location : var.default_location
+      tags              = length(cloussql_instance.tags) > 0 ? cloussql_instance.tags : var.global_tags
     }
   ]
 
@@ -83,11 +85,12 @@ locals {
     for obj in flatten([
       for item in local.cloudsql_instances_to_be_tagged : [
         for tag in item.tags : {
-          instance_name     = item.instance_name
+          instance_id       = item.instance_id
+          instance_location = item.instance_location
           tag_friendly_name = tag
         }
       ]
-    ]) : "${obj.instance_name}--${obj.tag_friendly_name}" => obj
+    ]) : "${obj.instance_id}--${obj.tag_friendly_name}" => obj
   }
 }
 
@@ -115,7 +118,8 @@ data "google_tags_tag_value" "tag_values" {
 
 # Buckets need a location tag binding.
 resource "google_tags_location_tag_binding" "buckets" {
-  for_each  = local.map_of_buckets_to_be_tagged
+  for_each = local.map_of_buckets_to_be_tagged
+  # Parent full resource name reference: https://cloud.google.com/iam/docs/full-resource-names
   parent    = "//storage.googleapis.com/projects/_/buckets/${each.value.bucket_name}"
   location  = each.value.bucket_location
   tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
@@ -123,8 +127,10 @@ resource "google_tags_location_tag_binding" "buckets" {
 
 # For a CloudSQL instance, even if regional, we can use a normal tag binding,
 # without the need to specify location.
-resource "google_tags_tag_binding" "cloudsql" {
-  for_each  = local.map_of_cloudsql_instances_to_be_tagged
-  parent    = "//cloudresourcemanager.googleapis.com/projects/${data.google_project.project.number}"
+resource "google_tags_location_tag_binding" "cloudsql" {
+  for_each = local.map_of_cloudsql_instances_to_be_tagged
+  # Parent full resource name reference: https://cloud.google.com/iam/docs/full-resource-names
+  parent    = "//sqladmin.googleapis.com/projects/${data.google_project.project.number}/instances/${each.value.instance_id}"
+  location  = each.value.instance_location
   tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
 }
