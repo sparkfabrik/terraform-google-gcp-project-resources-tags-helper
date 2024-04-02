@@ -41,7 +41,7 @@ variable "cloudsql_instances_to_be_tagged" {
 }
 
 variable "artifact_registry_repositories_to_be_tagged" {
-  description = "A structured list of objects, containing the list of Artifact registry we want to tag, with instance name, instance location (region) and tag values."
+  description = "A structured list of objects, containing the list of repositories we want to tag, with repository id, repository location (region) and tag values."
   type = list(object({
     repository_id       = string
     repository_location = optional(string, null)

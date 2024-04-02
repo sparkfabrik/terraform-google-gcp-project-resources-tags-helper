@@ -155,6 +155,7 @@ resource "google_tags_location_tag_binding" "cloudsql" {
   tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
 }
 
+# Tag bindings for Artifact Registry repositories.
 resource "google_tags_location_tag_binding" "artifact_registry" {
   for_each = local.map_of_artifact_registry_repositories_to_be_tagged
   # Parent full resource name reference: https://cloud.google.com/artifact-registry/docs/repositories/tag-repos#attach

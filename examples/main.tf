@@ -27,6 +27,18 @@ locals {
       ]
     },
   ]
+
+  artifact_registry_repositories_to_be_tagged = [
+    {
+      repository_id = "repository-1"
+      tags = [
+        "dev-team/editor", "external-team/editor"
+      ]
+    },
+    {
+      repository_id = "repository-2"
+    }
+  ]
 }
 
 # ------------------------------
@@ -36,6 +48,7 @@ module "project_resources_tags" {
   project_id            = "my-project-id"
   tags_to_be_discovered = local.tags_to_discover
   buckets_to_be_tagged  = local.buckets_to_tag
+  artifact_registry_repositories_to_be_tagged = local.artifact_registry_repositories_to_be_tagged
   global_tags           = [
     "dev-team/editor", "external-team/viewer"
   ]
