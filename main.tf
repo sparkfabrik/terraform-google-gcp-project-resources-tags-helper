@@ -101,7 +101,7 @@ locals {
     for repository in var.artifact_registry_repositories_to_be_tagged : {
       repository_id       = repository.repository_id
       repository_location = repository.repository_location != null ? repository.repository_location : var.default_location
-      tags              = length(repository.tags) > 0 ? repository.tags : var.global_tags
+      tags                = length(repository.tags) > 0 ? repository.tags : var.global_tags
     }
   ]
 
@@ -111,7 +111,7 @@ locals {
         for tag in item.tags : {
           repository_id       = item.repository_id
           repository_location = item.repository_location
-          tag_friendly_name = tag
+          tag_friendly_name   = tag
         }
       ]
     ]) : "${obj.repository_id}--${obj.tag_friendly_name}" => obj
