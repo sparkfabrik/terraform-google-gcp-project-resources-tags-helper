@@ -38,7 +38,10 @@ locals {
   unique_tags_in_cloudsql_instances = distinct(flatten([
     for cloudsql in var.cloudsql_instances_to_be_tagged : cloudsql.tags
   ]))
-  all_used_unique_tags = distinct(concat(local.unique_tags_in_buckets, local.unique_tags_in_cloudsql_instances, var.global_tags))
+  unique_tags_in_artifact_registry_repositories = distinct(flatten([
+    for repository in var.artifact_registry_repositories_to_be_tagged : repository.tags
+  ]))
+  all_used_unique_tags = distinct(concat(local.unique_tags_in_buckets, local.unique_tags_in_cloudsql_instances, local.unique_tags_in_artifact_registry_repositories, var.global_tags))
 
   # Add the global tags to the buckets we want to tag and populate bucket location.
   buckets_to_be_tagged = [
@@ -92,6 +95,27 @@ locals {
       ]
     ]) : "${obj.instance_id}--${obj.tag_friendly_name}" => obj
   }
+
+  # Add the global tags to the Artifact Registry repository we want to tag.
+  artifact_registry_repositories_to_be_tagged = [
+    for repository in var.artifact_registry_repositories_to_be_tagged : {
+      repository_id       = repository.repository_id
+      repository_location = repository.repository_location != null ? repository.repository_location : var.default_location
+      tags                = length(repository.tags) > 0 ? repository.tags : var.global_tags
+    }
+  ]
+
+  map_of_artifact_registry_repositories_to_be_tagged = {
+    for obj in flatten([
+      for item in local.artifact_registry_repositories_to_be_tagged : [
+        for tag in item.tags : {
+          repository_id       = item.repository_id
+          repository_location = item.repository_location
+          tag_friendly_name   = tag
+        }
+      ]
+    ]) : "${obj.repository_id}--${obj.tag_friendly_name}" => obj
+  }
 }
 
 # Retrieve the tag keys for the tags that we are passing to the resources.
@@ -128,5 +152,14 @@ resource "google_tags_location_tag_binding" "cloudsql" {
   # Parent full resource name reference: https://cloud.google.com/iam/docs/full-resource-names
   parent    = "//sqladmin.googleapis.com/projects/${var.project_id}/instances/${each.value.instance_id}"
   location  = each.value.instance_location
+  tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
+}
+
+# Tag bindings for Artifact Registry repositories.
+resource "google_tags_location_tag_binding" "artifact_registry" {
+  for_each = local.map_of_artifact_registry_repositories_to_be_tagged
+  # Parent full resource name reference: https://cloud.google.com/artifact-registry/docs/repositories/tag-repos#attach
+  parent    = "//artifactregistry.googleapis.com/projects/${var.project_id}/locations/${each.value.repository_location}/repositories/${each.value.repository_id}"
+  location  = each.value.repository_location
   tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
 }
