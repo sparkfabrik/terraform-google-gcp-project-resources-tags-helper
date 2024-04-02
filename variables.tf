@@ -24,8 +24,8 @@ variable "buckets_to_be_tagged" {
   description = "A structured list of objects, containing the list of buckets we want to tag and the tag values, in the form `<TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>`. If no bucket_location is specified, the value of default_location will be used."
   type = list(object({
     bucket_name     = string
-    tags            = optional(list(string), [])
     bucket_location = optional(string, null)
+    tags            = optional(list(string), [])
   }))
   default = []
 }
@@ -34,8 +34,18 @@ variable "cloudsql_instances_to_be_tagged" {
   description = "A structured list of objects, containing the list of cloudSQL instances we want to tag, with instance name, instance location (region) and tag values."
   type = list(object({
     instance_id       = string
-    tags              = optional(list(string), [])
     instance_location = optional(string, null)
+    tags              = optional(list(string), [])
+  }))
+  default = []
+}
+
+variable "artifact_registry_repositories_to_be_tagged" {
+  description = "A structured list of objects, containing the list of Artifact registry we want to tag, with instance name, instance location (region) and tag values."
+  type = list(object({
+    repository_id       = string
+    repository_location = optional(string, null)
+    tags                = optional(list(string), [])
   }))
   default = []
 }
