@@ -1,25 +1,33 @@
 # Helper module to bind tags to Google Cloud Platform resources
 
-A simple module used to retrieve tags data from a GCP project and to assign tags 
-(binding) to passed resources. The module will create the bindings if they don't 
-exist, but it will fail to create the bindings if they are already present. 
+A simple module used to retrieve tags data from a GCP project and to assign tags
+(binding) to passed resources. The module will create the bindings if they don't
+exist, but it will fail to create the bindings if they are already present.
 
-Actually the **module supports tagging of storage buckets** and **CloudSQL instances**.
+Actually the **module supports tagging of**:
+
+- **Cloud Storage buckets**
+- **CloudSQL instances**
+- **Artifact Registry repositories**
 
 **IMPORTANT**: when tagging multi-regional buckets, check the location in the
 Google cloud console (for example it can be `eu`). When tagging clodSQL instances,
 you must specify the region as the location, not the zone (for example `europe-west1`
 and not `europe-west1-b`).
 
-You can pass the tags to the module in a user-friendly and easy to read format, 
+**IMPORTANT**: all the CloudSQL roles have to be granted at the project level as lowest-level.
+This means that you can tag resources only for convinience, but you can not use them in the IAM
+conditions.
+
+You can pass the tags to the module in a user-friendly and easy to read format,
 <TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>, so that it will be easy to understand,
 for example, you can write tasgs to be applied to resources like:
 
 `["dev-team/viewer", "ops-team/admin"]`
 
-You can also use the module to retrieve information about tags availables in your 
+You can also use the module to retrieve information about tags availables in your
 project, populanting the variable `tags_to_be_discovered` with a full tag structure,
-where the tag key is the map key, and the tag values are the values of each map key. 
+where the tag key is the map key, and the tag values are the values of each map key.
 For example:
 
 ```terraform

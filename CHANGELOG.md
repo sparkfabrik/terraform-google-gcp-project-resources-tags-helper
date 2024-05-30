@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] - 2024-04-02
 
+[Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-project-resources-tags-helper/compare/0.1.0...0.2.0)
+
 ### Added
 
 - Add support for Artifact Registry tags
