@@ -28,6 +28,10 @@ data "google_tags_tag_value" "project_tag_values_to_be_discovered" {
   short_name = each.value.tag_value_shortname
 }
 
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
 # ---------------------------------
 # Binding Google Tags to resources
 # ---------------------------------
@@ -159,7 +163,9 @@ resource "google_tags_location_tag_binding" "cloudsql" {
 resource "google_tags_location_tag_binding" "artifact_registry" {
   for_each = local.map_of_artifact_registry_repositories_to_be_tagged
   # Parent full resource name reference: https://cloud.google.com/artifact-registry/docs/repositories/tag-repos#attach
-  parent    = "//artifactregistry.googleapis.com/projects/${var.project_id}/locations/${each.value.repository_location}/repositories/${each.value.repository_id}"
+  # For the Artifact Registry, the parent needs to be in the form:
+  # //artifactregistry.googleapis.com/projects/PROJECT_NUMBER/locations/LOCATION/repositories/REPOSITORY_ID
+  parent    = "//artifactregistry.googleapis.com/projects/${data.google_project.project.number}/locations/${each.value.repository_location}/repositories/${each.value.repository_id}"
   location  = each.value.repository_location
   tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
 }
